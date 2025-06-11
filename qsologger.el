@@ -1,10 +1,10 @@
 ;;; qsologger.el --- Customizable, Dynamic QSO Logger  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2024, W6PEN
+;; Copyright (C) 2025, David Pentrack
 
-;; Author: W6PEN
+;; Author: David Pentrack, K6SM
 ;; Keywords: lisp
-;; Version: 0.8.5
+;; Version: 0.9
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -699,6 +699,37 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
     ;; Add submit and quit buttons
     (widget-insert "\n")
     (widget-create 'push-button
+               :notify (lambda (&rest _)
+                             (let ((adif-string "")
+				   (call-value nil)
+                                   (date-value "")
+                                   (time-value ""))
+                               ;; Collect data from each widget
+                               (dolist (field-pair widget-alist)
+                                 (let* ((field (nth 0 field-pair))
+                                        (widget (nth 1 field-pair))
+                                        (clear-after-submit (nth 2 field-pair))
+                                        (value (widget-value widget)))
+                                   ;; Store the CALL value for duplicate check
+                                   (when (eq field 'CALL)
+                                     (setq call-value value)))
+				 (setq url (format "https://callook.info/%s/text" call-value))
+				 (setq buffer (url-retrieve-synchronously url)))
+			       (if buffer
+				   (with-current-buffer buffer
+				     (goto-char (point-min))
+				     (re-search-forward "^$" nil 'move)
+				     (forward-line)
+				     (let ((content (buffer-substring (point) (point-max))))
+				       (with-current-buffer (get-buffer-create "*Callsign Info*")
+					 (erase-buffer)
+					 (insert content)
+					 (goto-char (point-min))
+					 (display-buffer (current-buffer)))))))
+			     (message "Callsign Info Acquired"))
+	       "Lookup")
+    (widget-insert " ") ;; Add a space between buttons
+    (widget-create 'push-button
                    :notify (lambda (&rest _)
                              (let ((adif-string "")
 				   (call-value nil)
@@ -775,7 +806,24 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
     (widget-insert " ") ;; Add a space between buttons
     (widget-create 'push-button
                    :notify (lambda (&rest _)
-                             (kill-buffer "*QSO Log Entry*"))
+                             (let ((adif-string "")
+				   (call-value nil)
+                                   (date-value "")
+                                   (time-value ""))
+                               ;; Collect data from each widget
+                               (dolist (field-pair widget-alist)
+                                 (let* ((field (nth 0 field-pair))
+                                        (widget (nth 1 field-pair))
+                                        (clear-after-submit (nth 2 field-pair))
+                                        (value (widget-value widget)))
+                                     (when clear-after-submit
+                                     (widget-value-set widget ""))))))
+                   "Clear")
+    (widget-insert " ") ;; Add a space between buttons
+    (widget-create 'push-button
+                   :notify (lambda (&rest _)
+                             (kill-buffer "*QSO Log Entry*")
+                             (kill-buffer "*Callsign Info*"))
                    "Quit")
     (use-local-map widget-keymap)
     (widget-setup)))
