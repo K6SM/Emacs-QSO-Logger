@@ -4,7 +4,7 @@
 
 ;; Author: David Pentrack, K6SM
 ;; Keywords: lisp
-;; Version: 0.9
+;; Version: 0.9.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -33,8 +33,15 @@
   :type 'string
   :group 'qso-logger)
 
+(defcustom qso-call-lookup t
+  "If non-nil, provide a callsign lookup function/button next to the Callsign field."
+  :tag "QSO Callsign Lookup"
+  :type 'boolean
+  :group 'qso-logger)
+
 (defcustom qso-call-duplicates t
   "Enable duplicate callsign checking"
+  :tag "QSO Call Duplicates"
   :type 'boolean
   :group 'qso-logger)
 
@@ -49,7 +56,6 @@
     (RST_RCVD . t)
     (RST_SENT . nil)
     (FREQ . nil)
-    (BAND . nil)
     (MODE . nil)
     (COMMENT . t))
   "Fields to be shown in the QSO Log Entry form and whether they should be cleared after submission.
@@ -272,7 +278,7 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
 			 (item :tag "1mm" :value "1mm")
 			 (item :tag "submm" :value "submm")))
     (BAND_RX . (editable-field :format "BAND_RX: %v\n" :size 40 :value ""))
-    (CALL . (editable-field :format "CALL: %v\n" :size 10 :value ""))
+    (CALL . (editable-field :format "CALL: %v " :size 10 :value ""))
     (CHECK . (editable-field :format "CHECK: %v\n" :size 40 :value ""))
     (CLASS . (editable-field :format "CLASS: %v\n" :size 40 :value ""))
     (CLUBLOG_QSO_UPLOAD_DATE . (editable-field :format "CLUBLOG_QSO_UPLOAD_DATE: %v\n" :size 40 :value ""))
@@ -694,41 +700,45 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
              (field-definition (alist-get field qso-form-field-definitions)))
         (when field-definition
           (let ((widget (apply 'widget-create field-definition)))
-            (setq widget-alist (append widget-alist (list (list field widget clear-after-submit))))))))
+            (setq widget-alist (append widget-alist (list (list field widget clear-after-submit))))
+	    (when (and (eq field 'CALL) qso-call-lookup)
+	      (widget-create 'push-button
+			     :notify (lambda (&rest _)
+				       (let ((adif-string "")
+					     (call-value nil)
+					     (date-value "")
+					     (time-value ""))
+					 ;; Collect data from each widget
+					 (dolist (field-pair widget-alist)
+					   (let* ((field (nth 0 field-pair))
+						  (widget (nth 1 field-pair))
+						  (clear-after-submit (nth 2 field-pair))
+						  (value (widget-value widget)))
+					     ;; Store the CALL value for duplicate check
+					     (when (eq field 'CALL)
+					       (setq call-value value)))
+					   (setq url (format "https://callook.info/%s/text" call-value))
+					   (setq buffer (url-retrieve-synchronously url)))
+					 (if buffer
+					     (with-current-buffer buffer
+					       (goto-char (point-min))
+					       (re-search-forward "^$" nil 'move)
+					       (forward-line)
+					       (let ((content (buffer-substring (point) (point-max))))
+						 (with-current-buffer (get-buffer-create "*Callsign Info*")
+						   (erase-buffer)
+						   (insert content)
+						   (goto-char (point-min))
+						   (display-buffer (current-buffer)))))))
+				       (message "Callsign Info Acquired"))
+			     "Lookup")
+	      (widget-insert "\n"))
+	    (when (and (eq field 'CALL) (not qso-call-lookup))
+	      (widget-insert "\n"))
+	    ))))
 
-    ;; Add submit and quit buttons
+    ;; Add submit, clear and quit buttons
     (widget-insert "\n")
-    (widget-create 'push-button
-               :notify (lambda (&rest _)
-                             (let ((adif-string "")
-				   (call-value nil)
-                                   (date-value "")
-                                   (time-value ""))
-                               ;; Collect data from each widget
-                               (dolist (field-pair widget-alist)
-                                 (let* ((field (nth 0 field-pair))
-                                        (widget (nth 1 field-pair))
-                                        (clear-after-submit (nth 2 field-pair))
-                                        (value (widget-value widget)))
-                                   ;; Store the CALL value for duplicate check
-                                   (when (eq field 'CALL)
-                                     (setq call-value value)))
-				 (setq url (format "https://callook.info/%s/text" call-value))
-				 (setq buffer (url-retrieve-synchronously url)))
-			       (if buffer
-				   (with-current-buffer buffer
-				     (goto-char (point-min))
-				     (re-search-forward "^$" nil 'move)
-				     (forward-line)
-				     (let ((content (buffer-substring (point) (point-max))))
-				       (with-current-buffer (get-buffer-create "*Callsign Info*")
-					 (erase-buffer)
-					 (insert content)
-					 (goto-char (point-min))
-					 (display-buffer (current-buffer)))))))
-			     (message "Callsign Info Acquired"))
-	       "Lookup")
-    (widget-insert " ") ;; Add a space between buttons
     (widget-create 'push-button
                    :notify (lambda (&rest _)
                              (let ((adif-string "")
