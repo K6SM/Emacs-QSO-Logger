@@ -7,13 +7,15 @@ qso-logger group, whose parent is the Emacs "Applications" group, accessed with 
 Further processing of the logs can be done within Emacs or by importing the ADIF file into another logging program.  
 
 ## Features
-- Simple text-only interface for real-time ham radio QSO logging or even to rapidly convert paper log entries to an ADIF.
+- Simple, customizable text interface for real-time ham radio QSO logging or even to rapidly convert paper log entries to an ADIF
 - Runs entirely in a Linux terminal environment, allowing for its use in ultra-light, low-power HW/SW configurations (e.g. terminal-only mode on a Raspberry Pi Zero 2W)
-- Data from a customizable form is appended to an ADIF log file 
+- No mouse required (using tab or shift-tab to change fields or hover over buttons)
+- Log entries are appended to a user-specified ADIF log file
 - Any field in the ADIF 3.1.4 specification can be selected to appear on the form, in whatever order is desired
 - Each field has an option to preserve the most recent information after a QSO submission
    - Example: For situations where frequency and mode unchanged between QSOs
    - Also useful for repeating sent information reports in contests
+- Automatically populates BAND based on FREQ for commonly used bands, if otherwise left blank or not shown on the form
 - Option to lookup callsign information and show the information (text) in another buffer (requires an internet connection)
 - Option to check the log for duplicates before recording the QSO
 - Option to clear the form without saving the information (e.g. for incomplete QSOs)
