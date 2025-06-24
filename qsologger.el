@@ -4,7 +4,7 @@
 
 ;; Author: David Pentrack, K6SM
 ;; Keywords: lisp
-;; Version: 0.9.3
+;; Version: 0.9.4
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -1021,77 +1021,74 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
 				     (insert (format "%s\n" qso-adif-title))
 				     (insert "<ADIF_VER:5>3.1.4\n")
 				     (insert (format "<CREATED_TIMESTAMP:15>%s\n" timestamp))
-				     (insert "<PROGRAMID:16>Emacs-QSO-Logger\n<PROGRAMVERSION:5>0.9.3\n<EOH>\n"))
+				     (insert "<PROGRAMID:16>Emacs-QSO-Logger\n<PROGRAMVERSION:5>0.9.4\n<EOH>\n"))
 				   (write-region (point-min) (point-max) qso-adif-path t))
 				 (message "File created, header written to file"))
-			       ;; Check for duplicate callsign
-			       (let ((duplicate nil)
-				     (duplicate-data nil))
-                                 (when (and qso-call-duplicates
-					    call-value
-					    (not (string-empty-p call-value)))
+			       ;; Check for duplicate callsign	
+			       (when (and qso-call-duplicates
+					  call-value
+					  (not (string-empty-p call-value)))
+				 (let ((pattern (format "<CALL:%d>%s"
+							(length (format "%s" call-value))
+							(regexp-quote call-value))))
 				   (with-temp-buffer
 				     (insert-file-contents qso-adif-path)
-				     (goto-char (point-max))
-				     (setq duplicate (re-search-backward (format "<CALL:[0-9]+>%s" (regexp-quote call-value)) nil t))
-				     (when duplicate
-				       ;; Capture the most recent duplicate entry
-				       (let ((start (line-beginning-position))
-					     (end (line-end-position)))
-                                         (setq duplicate-data (buffer-substring start end))))))
-                                 (if (and duplicate
-					  (not (y-or-n-p (format "Duplicate: '%s' already exists. Most recent entry:\n%s\nDo you wish to proceed? " call-value duplicate-data))))
-				     (message "Submission canceled due to duplicate callsign.")
-				   (progn
-				     ;; Get the current UTC date and time if date and time fields are empty
-				     (let* ((current-time (current-time))
-					    (utc-time (format-time-string "%Y%m%d %H%M%S" current-time t))
-					    (date (substring utc-time 0 8))
-					    (time (substring utc-time 9 15)))
-				       (unless (and date-value (not (string-empty-p date-value)))
-					 (setq date-value date))
-				       (unless (and time-value (not (string-empty-p time-value)))
-					 (setq time-value time))
-				       ;; Auto-calculate BAND from FREQ if BAND not already included
-				       (unless (string-match "<BAND:" adif-string)
-					 (when (string-match "<FREQ:[0-9]+>\\([0-9.]+\\)" adif-string)
-					   (let* ((freq-str (match-string 1 adif-string))
-						  (freq (string-to-number freq-str))
-						  (band
-						   (cond
-						    ((and (>= freq 1.8) (<= freq 2.0)) "160m")
-						    ((and (>= freq 3.5) (<= freq 4.0)) "80m")
-						    ((and (>= freq 5.3305) (<= freq 5.405)) "60m")
-						    ((and (>= freq 7.0) (<= freq 7.3)) "40m")
-						    ((and (>= freq 10.1) (<= freq 10.15)) "30m")
-						    ((and (>= freq 14.0) (<= freq 14.35)) "20m")
-						    ((and (>= freq 18.068) (<= freq 18.168)) "17m")
-						    ((and (>= freq 21.0) (<= freq 21.45)) "15m")
-						    ((and (>= freq 24.89) (<= freq 24.99)) "12m")
-						    ((and (>= freq 28.0) (<= freq 29.7)) "10m")
-						    ((and (>= freq 50.0) (<= freq 54.0)) "6m")
-						    ((and (>= freq 144.0) (<= freq 148.0)) "2m")
-						    ((and (>= freq 219.0) (<= freq 225.0)) "1.25m")
-						    ((and (>= freq 430.0) (<= freq 450.0)) "70cm")
-						    (t nil))))
-					     (when band
-					       (setq adif-string
-						     (concat adif-string
-							     (format "<BAND:%d>%s" (length band) band)))))))
-				       ;; Append date and time to the ADIF string
-                                       (setq adif-string
-                                             (concat adif-string
-                                                     (format "<QSO_DATE:8>%s" date-value)
-                                                     (format "<TIME_ON:6>%s" time-value)
-						     "<OPERATOR:" 
-						     (format "%d" (length (format "%s" OPERATOR))) ">"
-						     (format "%s" OPERATOR)"<eor>\n"
-						     ))))
-				   ;; Append data to file
-				   (with-temp-buffer
-                                     (insert adif-string)
-                                     (write-region (point-min) (point-max) qso-adif-path t))
-				   (message "QSO logged!")))))
+				     (occur pattern)
+				     (let ((occur-buf "*Occur*"))
+				       (when (get-buffer occur-buf)
+					 (display-buffer occur-buf)
+					 (unless (y-or-n-p "Duplicate(s) found — proceed anyway? ")
+					   (user-error "Submission canceled due to duplicate callsign.")))))))
+			       (progn
+				 ;; Get the current UTC date and time if date and time fields are empty
+				 (let* ((current-time (current-time))
+					(utc-time (format-time-string "%Y%m%d %H%M%S" current-time t))
+					(date (substring utc-time 0 8))
+					(time (substring utc-time 9 15)))
+				   (unless (and date-value (not (string-empty-p date-value)))
+				     (setq date-value date))
+				   (unless (and time-value (not (string-empty-p time-value)))
+				     (setq time-value time))
+				   ;; Auto-calculate BAND from FREQ if BAND not already included
+				   (unless (string-match "<BAND:" adif-string)
+				     (when (string-match "<FREQ:[0-9]+>\\([0-9.]+\\)" adif-string)
+				       (let* ((freq-str (match-string 1 adif-string))
+					      (freq (string-to-number freq-str))
+					      (band
+					       (cond
+						((and (>= freq 1.8) (<= freq 2.0)) "160m")
+						((and (>= freq 3.5) (<= freq 4.0)) "80m")
+						((and (>= freq 5.3305) (<= freq 5.405)) "60m")
+						((and (>= freq 7.0) (<= freq 7.3)) "40m")
+						((and (>= freq 10.1) (<= freq 10.15)) "30m")
+						((and (>= freq 14.0) (<= freq 14.35)) "20m")
+						((and (>= freq 18.068) (<= freq 18.168)) "17m")
+						((and (>= freq 21.0) (<= freq 21.45)) "15m")
+						((and (>= freq 24.89) (<= freq 24.99)) "12m")
+						((and (>= freq 28.0) (<= freq 29.7)) "10m")
+						((and (>= freq 50.0) (<= freq 54.0)) "6m")
+						((and (>= freq 144.0) (<= freq 148.0)) "2m")
+						((and (>= freq 219.0) (<= freq 225.0)) "1.25m")
+						((and (>= freq 430.0) (<= freq 450.0)) "70cm")
+						(t nil))))
+					 (when band
+					   (setq adif-string
+						 (concat adif-string
+							 (format "<BAND:%d>%s" (length band) band)))))))
+				   ;; Append date and time to the ADIF string
+                                   (setq adif-string
+                                         (concat adif-string
+                                                 (format "<QSO_DATE:8>%s" date-value)
+                                                 (format "<TIME_ON:6>%s" time-value)
+						 "<OPERATOR:" 
+						 (format "%d" (length (format "%s" OPERATOR))) ">"
+						 (format "%s" OPERATOR)"<eor>\n"
+						 )))
+				 ;; Append data to file
+				 (with-temp-buffer
+                                   (insert adif-string)
+                                   (write-region (point-min) (point-max) qso-adif-path t))))
+			     (message "QSO logged!"))
 		   "Submit")
     (widget-insert " ") ;; Add a space between buttons
     (widget-create 'push-button
@@ -1112,8 +1109,7 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
     (widget-insert " ") ;; Add a space between buttons
     (widget-create 'push-button
                    :notify (lambda (&rest _)
-                             (kill-buffer "*QSO Log Entry*")
-                             (kill-buffer "*Callsign Info*"))
+                             (kill-buffer "*QSO Log Entry*"))
                    "Quit")
     (use-local-map widget-keymap)
     (widget-setup)))
