@@ -58,6 +58,16 @@
 ;; - Option to check the log for duplicates before recording the QSO
 ;; - Option to clear the form without saving the information (e.g.
 ;;   for incomplete QSOs)
+;;
+;; Getting Started
+;;
+;;  1) Execute M-x customize, select "Applications" and then select "QSO" to see the customization options.
+;;  2) Enter your callsign in the QSO Operator field.
+;;  3) Enter the path to the ADIF file you will be using (e.g. ~/qsolog.adi).
+;;  4) Add, remove, or reorder the fields you wish to have on the form.
+;;  5) Select or deselect form fields that you wish you have cleared after a QSO submission (especially helpful for contests).
+;;  6) Click "Apply" or "Apply and Save" as appropriate.
+;;  7) Execute M-x qso-log-form to bring up and begin using the log entry form.
 
 ;;; Code:
 
