@@ -1,5 +1,6 @@
 # Emacs-QSO-Logger
-This LISP code provides some basic functions for Emacs to rapidly capture and log amateur radio contacts (QSOs).
+This LISP code provides some basic functions for Emacs to rapidly capture and log amateur radio contacts (QSOs) into an ADIF file.
+
 qso.el provides a fuction that generates a customizable, dynamic form (qso-log-form) to log amateur radio QSOs using almost any combination of ADIF fields in the ADIF 3.1.4 specification. This allows 
 the user to customize the form for use in contests or general logging. All customizations are accessible in the 
 QSO group, whose parent is the Emacs "Applications" group, accessed with `M-x customize`.
