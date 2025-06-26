@@ -24,13 +24,16 @@
 ;;; Commentary:
 
 ;; This LISP code provides some basic functions for Emacs to rapidly
-;; capture and log amateur radio contacts (QSOs).  qso.el provides
-;; a fuction that generates a customizable, dynamic form (qso-log-form)
-;; to log amateur radio QSOs using almost any combination of ADIF
-;; fields in the ADIF 3.1.4 specification.  This allows the user to
-;; customize the form for use in contests or general logging.  All
-;; customizations are accessible in the "QSO" group, whose parent
-;; is the Emacs "Applications" group, accessed with M-x customize.
+;; capture and log amateur radio contacts (QSOs) into an ADIF file.
+;;
+;; qso.el provides a fuction that generates a customizable, dynamic
+;; form (qso-log-form) to log amateur radio QSOs using almost any
+;; combination of ADIF fields in the ADIF 3.1.4 specification.
+;; This allows the user to customize the form for use in contests or
+;; general logging.  All customizations are accessible in the "QSO"
+;; group, whose parent is the Emacs "Applications" group, accessed
+;; with M-x customize.
+;;
 ;; Further processing of the logs can be done within Emacs or by
 ;; importing the ADIF file into another logging program.
 
@@ -58,6 +61,16 @@
 ;; - Option to check the log for duplicates before recording the QSO
 ;; - Option to clear the form without saving the information (e.g.
 ;;   for incomplete QSOs)
+;;
+;; Getting Started
+;;
+;;  1) Execute M-x customize, select "Applications" and then select "QSO" to see the customization options.
+;;  2) Enter your callsign in the QSO Operator field.
+;;  3) Enter the path to the ADIF file you will be using (e.g. ~/qsolog.adi).
+;;  4) Add, remove, or reorder the fields you wish to have on the form.
+;;  5) Select or deselect form fields that you wish you have cleared after a QSO submission (especially helpful for contests).
+;;  6) Click "Apply" or "Apply and Save" as appropriate.
+;;  7) Execute M-x qso-log-form to bring up and begin using the log entry form.
 
 ;;; Code:
 
