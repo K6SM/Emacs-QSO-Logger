@@ -1,8 +1,8 @@
 # Emacs-QSO-Logger
 This LISP code provides some basic functions for Emacs to rapidly capture and log amateur radio contacts (QSOs).
-qsologger.el provides a fuction that generates a customizable, dynamic form (qso-log-form) to log amateur radio QSOs using almost any combination of ADIF fields in the ADIF 3.1.4 specification. This allows 
+qso.el provides a fuction that generates a customizable, dynamic form (qso-log-form) to log amateur radio QSOs using almost any combination of ADIF fields in the ADIF 3.1.4 specification. This allows 
 the user to customize the form for use in contests or general logging. All customizations are accessible in the 
-qso-logger group, whose parent is the Emacs "Applications" group, accessed with `M-x customize`.
+qso group, whose parent is the Emacs "Applications" group, accessed with `M-x customize`.
 
 Further processing of the logs can be done within Emacs or by importing the ADIF file into another logging program.  
 
@@ -23,7 +23,7 @@ Further processing of the logs can be done within Emacs or by importing the ADIF
 ## Manual Installation
 1) Place qsologger.el in the load path. If one hasn't been established, you can place it in `~/.emacs.d/lisp/` and
    then, in the init.el file (located in ~/.emacs.d/) add: `(add-to-list 'load-path "~/.emacs.d/lisp/")`
-2) Add to the init.el file: `(require 'qsologger)`
+2) Add to the init.el file: `(require 'qso)`
 3) Restart Emacs
 
 ## Getting Started
