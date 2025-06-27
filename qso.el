@@ -4,7 +4,7 @@
 ;; Author: David Pentrack
 ;; URL: https://github.com/K6SM/Emacs-QSO-Logger
 ;; Keywords: lisp
-;; Version: 1.0
+;; Version: 1.0.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -1075,7 +1075,7 @@
 				     (insert (format "%s\n" qso-adif-title))
 				     (insert "<ADIF_VER:5>3.1.4\n")
 				     (insert (format "<CREATED_TIMESTAMP:15>%s\n" timestamp))
-				     (insert "<PROGRAMID:16>Emacs-QSO-Logger\n<PROGRAMVERSION:5>1.0\n<EOH>\n"))
+				     (insert "<PROGRAMID:16>Emacs-QSO-Logger\n<PROGRAMVERSION:5>1.0.1\n<EOH>\n"))
 				   (write-region (point-min) (point-max) qso-adif-path t))
 				 (message "File created, header written to file"))
 			       ;; Check for duplicate callsign
@@ -1084,15 +1084,20 @@
 					  (not (string-empty-p call-value)))
 				 (let ((pattern (format "<CALL:%d>%s"
 							(length (format "%s" call-value))
-							(regexp-quote call-value))))
+							(regexp-quote call-value)))
+				       (occur-buf "*Occur*"))
 				   (with-temp-buffer
 				     (insert-file-contents qso-adif-path)
-				     (occur pattern)
-				     (let ((occur-buf "*Occur*"))
-				       (when (get-buffer occur-buf)
-					 (display-buffer occur-buf)
-					 (unless (y-or-n-p "Duplicate(s) found — proceed anyway? ")
-					   (user-error "Submission canceled due to duplicate callsign")))))))
+				     (occur pattern))
+;				     (let ((occur-buf "*Occur*"))
+				   (when (get-buffer occur-buf)
+				     (display-buffer occur-buf)
+				     (let ((proceed (y-or-n-p "Duplicate(s) found — proceed anyway? ")))
+				       (kill-buffer occur-buf)
+				       (goto-char (point-min))
+				       (widget-forward 1)
+				       (unless proceed
+					 (user-error "Submission canceled due to duplicate callsign"))))))
 			       (progn
 				 ;; Get the current UTC date and time if date and time fields are empty
 				 (let* ((current-time (current-time))
@@ -1141,6 +1146,8 @@
 				 (with-temp-buffer
                                    (insert adif-string)
                                    (write-region (point-min) (point-max) qso-adif-path t))))
+			     (goto-char (point-min))
+			     (widget-forward 1)
 			     (message "QSO logged!"))
 		   "Submit")
     (widget-insert " ") ;; Add a space between buttons
@@ -1157,7 +1164,9 @@
                                         (clear-after-submit (nth 2 field-pair))
                                         (value (widget-value widget)))
                                      (when clear-after-submit
-                                     (widget-value-set widget ""))))))
+                                       (widget-value-set widget "")))))
+			     (goto-char (point-min))
+			     (widget-forward 1))
                    "Clear")
     (widget-insert " ") ;; Add a space between buttons
     (widget-create 'push-button
