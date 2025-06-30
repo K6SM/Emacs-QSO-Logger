@@ -4,7 +4,7 @@
 ;; Author: David Pentrack
 ;; URL: https://github.com/K6SM/Emacs-QSO-Logger
 ;; Keywords: lisp
-;; Version: 1.0.1
+;; Version: 1.0.2
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -188,7 +188,6 @@
 				  (const :tag "MODE" MODE)
 				  (const :tag "MS_SHOWER" MS_SHOWER)
 				  (const :tag "MY_ALTITUDE" MY_ALTITUDE)
-				  (const :tag "MY_ANTENNA" MY_ANTENNA)
 				  (const :tag "MY_ANTENNA" MY_ANTENNA)
 				  (const :tag "MY_ARRL_SECT" MY_ARRL_SECT)
 				  (const :tag "MY_CITY" MY_CITY)
@@ -981,6 +980,7 @@
                                   (editable-field :menu-tag "No option" :value "Thus option"))))
   "QSO field definitions for the QSO Log Entry form.")
 
+
 (defun qso-log-form ()
   "Create a dynamic QSO log form based on `qso-form-fields`."
   (interactive)
@@ -1002,32 +1002,32 @@
 	    (when (and (eq field 'CALL) qso-call-lookup)
 	      (widget-create 'push-button
 			     :notify (lambda (&rest _)
-				       (let ((adif-string "")
+				       (let ((_adif-string "")
 					     (call-value nil)
-					     (date-value "")
-					     (time-value ""))
+					     (_date-value "")
+					     (_time-value ""))
 					 ;; Collect data from each widget
 					 (dolist (field-pair widget-alist)
 					   (let* ((field (nth 0 field-pair))
 						  (widget (nth 1 field-pair))
-						  (clear-after-submit (nth 2 field-pair))
+						  (_clear-after-submit (nth 2 field-pair))
 						  (value (widget-value widget)))
 					     ;; Store the CALL value for duplicate check
 					     (when (eq field 'CALL)
-					       (setq call-value value)))
-					   (setq url (format "https://callook.info/%s/text" call-value))
-					   (setq buffer (url-retrieve-synchronously url)))
-					 (if buffer
-					     (with-current-buffer buffer
-					       (goto-char (point-min))
-					       (re-search-forward "^$" nil 'move)
-					       (forward-line)
-					       (let ((content (buffer-substring (point) (point-max))))
-						 (with-current-buffer (get-buffer-create "*Callsign Info*")
-						   (erase-buffer)
-						   (insert content)
-						   (goto-char (point-min))
-						   (display-buffer (current-buffer)))))))
+					       (setq call-value value))))
+					 (let* ((url (format "https://callook.info/%s/text" call-value))
+					       (buffer (url-retrieve-synchronously url)))
+					   (if buffer
+					       (with-current-buffer buffer
+						 (goto-char (point-min))
+						 (re-search-forward "^$" nil 'move)
+						 (forward-line)
+						 (let ((content (buffer-substring (point) (point-max))))
+						   (with-current-buffer (get-buffer-create "*Callsign Info*")
+						     (erase-buffer)
+						     (insert content)
+						     (goto-char (point-min))
+						     (display-buffer (current-buffer))))))))
 				       (message "Callsign Info Acquired"))
 			     "Lookup")
 	      (widget-insert "\n"))
@@ -1075,7 +1075,7 @@
 				     (insert (format "%s\n" qso-adif-title))
 				     (insert "<ADIF_VER:5>3.1.4\n")
 				     (insert (format "<CREATED_TIMESTAMP:15>%s\n" timestamp))
-				     (insert "<PROGRAMID:16>Emacs-QSO-Logger\n<PROGRAMVERSION:5>1.0.1\n<EOH>\n"))
+				     (insert "<PROGRAMID:16>Emacs-QSO-Logger\n<PROGRAMVERSION:5>1.0.2\n<EOH>\n"))
 				   (write-region (point-min) (point-max) qso-adif-path t))
 				 (message "File created, header written to file"))
 			       ;; Check for duplicate callsign
@@ -1153,16 +1153,16 @@
     (widget-insert " ") ;; Add a space between buttons
     (widget-create 'push-button
                    :notify (lambda (&rest _)
-                             (let ((adif-string "")
-				   (call-value nil)
-                                   (date-value "")
-                                   (time-value ""))
+                             (let ((_adif-string "")
+				   (_call-value nil)
+                                   (_date-value "")
+                                   (_time-value ""))
                                ;; Collect data from each widget
                                (dolist (field-pair widget-alist)
-                                 (let* ((field (nth 0 field-pair))
+                                 (let* ((_field (nth 0 field-pair))
                                         (widget (nth 1 field-pair))
                                         (clear-after-submit (nth 2 field-pair))
-                                        (value (widget-value widget)))
+                                        (_value (widget-value widget)))
                                      (when clear-after-submit
                                        (widget-value-set widget "")))))
 			     (goto-char (point-min))
