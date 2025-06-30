@@ -4,7 +4,7 @@
 ;; Author: David Pentrack
 ;; URL: https://github.com/K6SM/Emacs-QSO-Logger
 ;; Keywords: lisp
-;; Version: 1.0.2
+;; Version: 1.0.3
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -64,13 +64,17 @@
 ;;
 ;; Getting Started
 ;;
-;;  1) Execute M-x customize, select "Applications" and then select "QSO" to see the customization options.
+;;  1) Execute M-x customize, select "Applications" and then select
+;;     "QSO" to see the customization options.
 ;;  2) Enter your callsign in the QSO Operator field.
-;;  3) Enter the path to the ADIF file you will be using (e.g. ~/qsolog.adi).
+;;  3) Enter the path to the ADIF file you will be using
+;;     (e.g. ~/qsolog.adi).
 ;;  4) Add, remove, or reorder the fields you wish to have on the form.
-;;  5) Select or deselect form fields that you wish you have cleared after a QSO submission (especially helpful for contests).
+;;  5) Select or deselect form fields that you wish you have cleared
+;;     after a QSO submission (especially helpful for contests).
 ;;  6) Click "Apply" or "Apply and Save" as appropriate.
-;;  7) Execute M-x qso-log-form to bring up and begin using the log entry form.
+;;  7) Execute M-x qso-log-form to bring up and begin using the log
+;;     entry form.
 
 ;;; Code:
 
@@ -1075,7 +1079,7 @@
 				     (insert (format "%s\n" qso-adif-title))
 				     (insert "<ADIF_VER:5>3.1.4\n")
 				     (insert (format "<CREATED_TIMESTAMP:15>%s\n" timestamp))
-				     (insert "<PROGRAMID:16>Emacs-QSO-Logger\n<PROGRAMVERSION:5>1.0.2\n<EOH>\n"))
+				     (insert "<PROGRAMID:16>Emacs-QSO-Logger\n<PROGRAMVERSION:5>1.0.3\n<EOH>\n"))
 				   (write-region (point-min) (point-max) qso-adif-path t))
 				 (message "File created, header written to file"))
 			       ;; Check for duplicate callsign
