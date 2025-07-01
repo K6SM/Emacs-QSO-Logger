@@ -4,7 +4,7 @@
 ;; Author: David Pentrack
 ;; URL: https://github.com/K6SM/Emacs-QSO-Logger
 ;; Keywords: lisp
-;; Version: 1.0.3
+;; Version: 1.0.4
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -764,8 +764,7 @@
     (QTH . (editable-field :format "QTH: %v\n" :size 40 :value ""))
     (QTH_INTL . (editable-field :format "QTH_INTL: %v\n" :size 40 :value ""))
     (REGION . (editable-field :format "REGION: %v\n" :size 40 :value ""))
-    (RIG . (editable-field :format "RIG: %v\n" :size 40
-    :value ""))
+    (RIG . (editable-field :format "RIG: %v\n" :size 40 :value ""))
     (RIG_INTL . (editable-field :format "RIG_INTL: %v\n" :size 40 :value ""))
     (RST_RCVD . (editable-field :format "RST_RCVD: %v\n" :size 6 :value ""))
     (RST_SENT . (editable-field :format "RST_SENT: %v\n" :size 6 :value ""))
@@ -1001,7 +1000,7 @@
              (clear-after-submit (cdr field-info))
              (field-definition (alist-get field qso-form-field-definitions)))
         (when field-definition
-          (let ((widget (apply 'widget-create field-definition)))
+          (let ((widget (apply #'widget-create field-definition)))
             (setq widget-alist (append widget-alist (list (list field widget clear-after-submit))))
 	    (when (and (eq field 'CALL) qso-call-lookup)
 	      (widget-create 'push-button
@@ -1079,7 +1078,7 @@
 				     (insert (format "%s\n" qso-adif-title))
 				     (insert "<ADIF_VER:5>3.1.4\n")
 				     (insert (format "<CREATED_TIMESTAMP:15>%s\n" timestamp))
-				     (insert "<PROGRAMID:16>Emacs-QSO-Logger\n<PROGRAMVERSION:5>1.0.3\n<EOH>\n"))
+				     (insert "<PROGRAMID:16>Emacs-QSO-Logger\n<PROGRAMVERSION:5>1.0.4\n<EOH>\n"))
 				   (write-region (point-min) (point-max) qso-adif-path t))
 				 (message "File created, header written to file"))
 			       ;; Check for duplicate callsign
@@ -1093,7 +1092,6 @@
 				   (with-temp-buffer
 				     (insert-file-contents qso-adif-path)
 				     (occur pattern))
-;				     (let ((occur-buf "*Occur*"))
 				   (when (get-buffer occur-buf)
 				     (display-buffer occur-buf)
 				     (let ((proceed (y-or-n-p "Duplicate(s) found — proceed anyway? ")))
