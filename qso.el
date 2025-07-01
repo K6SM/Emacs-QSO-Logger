@@ -4,7 +4,7 @@
 ;; Author: David Pentrack
 ;; URL: https://github.com/K6SM/Emacs-QSO-Logger
 ;; Keywords: lisp
-;; Version: 1.0.4
+;; Version: 1.0.5
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -1015,6 +1015,7 @@
 						  (widget (nth 1 field-pair))
 						  (_clear-after-submit (nth 2 field-pair))
 						  (value (widget-value widget)))
+					     (setq value (string-trim value)) ;; Remove whitespace
 					     ;; Store the CALL value for duplicate check
 					     (when (eq field 'CALL)
 					       (setq call-value value))))
@@ -1051,6 +1052,7 @@
                                         (widget (nth 1 field-pair))
                                         (clear-after-submit (nth 2 field-pair))
                                         (value (widget-value widget)))
+				   (setq value (string-trim value)) ;; Remove whitespace
                                    ;; Store the CALL value for duplicate check
                                    (when (eq field 'CALL)
                                      (setq call-value value))
@@ -1078,7 +1080,7 @@
 				     (insert (format "%s\n" qso-adif-title))
 				     (insert "<ADIF_VER:5>3.1.4\n")
 				     (insert (format "<CREATED_TIMESTAMP:15>%s\n" timestamp))
-				     (insert "<PROGRAMID:16>Emacs-QSO-Logger\n<PROGRAMVERSION:5>1.0.4\n<EOH>\n"))
+				     (insert "<PROGRAMID:16>Emacs-QSO-Logger\n<PROGRAMVERSION:5>1.0.5\n<EOH>\n"))
 				   (write-region (point-min) (point-max) qso-adif-path t))
 				 (message "File created, header written to file"))
 			       ;; Check for duplicate callsign
