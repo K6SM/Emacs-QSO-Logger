@@ -1,10 +1,10 @@
-;;; qso.el --- Customizable, Dynamic Amateur Radio QSO Logging -*- lexical-binding: t; -*-
+;;; qso.el --- Amateur radio QSO logging -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2025, David Pentrack
 ;; Author: David Pentrack
 ;; URL: https://github.com/K6SM/Emacs-QSO-Logger
 ;; Keywords: lisp
-;; Version: 1.0.5
+;; Version: 1.0.6
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -1080,7 +1080,7 @@
 				     (insert (format "%s\n" qso-adif-title))
 				     (insert "<ADIF_VER:5>3.1.4\n")
 				     (insert (format "<CREATED_TIMESTAMP:15>%s\n" timestamp))
-				     (insert "<PROGRAMID:16>Emacs-QSO-Logger\n<PROGRAMVERSION:5>1.0.5\n<EOH>\n"))
+				     (insert "<PROGRAMID:16>Emacs-QSO-Logger\n<PROGRAMVERSION:5>1.0.6\n<EOH>\n"))
 				   (write-region (point-min) (point-max) qso-adif-path t))
 				 (message "File created, header written to file"))
 			       ;; Check for duplicate callsign
@@ -1178,7 +1178,7 @@
                              (kill-buffer "*QSO Log Entry*"))
                    "Quit")
     (use-local-map widget-keymap)
-    (widget-setup)))
-
+    (widget-setup)
+    (widget-forward 1)))
 (provide 'qso)
 ;;; qso.el ends here
