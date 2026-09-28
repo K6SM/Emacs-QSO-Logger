@@ -3,9 +3,9 @@
 An Emacs form for logging amateur radio contacts (QSOs) to an ADIF file.
 
 `qso.el` provides `qso-log-form`, a customizable form built from almost any
-combination of fields in the ADIF 3.1.4 specification, so it can be set up for
-contest work or for general logging. Every setting is in the QSO customization
-group, under "Applications" in `M-x customize`.
+combination of ADIF fields, so it can be set up for contest work or for general
+logging. Every setting is in the QSO customization group, under "Applications"
+in `M-x customize`.
 
 Logs can be processed further within Emacs or imported into another logging
 program.
@@ -17,8 +17,10 @@ program.
   Raspberry Pi Zero 2W in terminal-only mode
 - No mouse required: `TAB` and `S-<tab>` move between fields and buttons
 - Entries are appended to a user-specified ADIF file
-- Any field in the ADIF 3.1.4 specification can appear on the form, in any
-  order
+- Any ADIF field can appear on the form, in any order
+- Menu choices for BAND, MODE, SUBMODE, CONTEST_ID, PROP_MODE and ANT_PATH, and
+  the format of the log, come from
+  [adif-mode](https://github.com/K6SM/adif-mode)
 - Each field can keep its value after a submission — useful when frequency and
   mode are unchanged between contacts, and for repeating sent reports in
   contests
@@ -31,9 +33,11 @@ program.
 
 ## Manual Installation
 
-1. Place qso.el in the load path. If one hasn't been established, you can place
-   it in `~/.emacs.d/lisp/` and then, in the init.el file (located in
-   `~/.emacs.d/`) add: `(add-to-list 'load-path "~/.emacs.d/lisp/")`
+1. Place qso.el and adif.el (from
+   [adif-mode](https://github.com/K6SM/adif-mode)) in the load path. If one
+   hasn't been established, you can place them in `~/.emacs.d/lisp/` and then,
+   in the init.el file (located in `~/.emacs.d/`) add:
+   `(add-to-list 'load-path "~/.emacs.d/lisp/")`
 2. Add to the init.el file: `(require 'qso)`
 3. Restart Emacs
 
@@ -178,5 +182,5 @@ to that mode in the mode map and it will be filled in automatically.
 ## Editing a Log
 
 [adif-mode](https://github.com/K6SM/adif-mode) reads and edits ADIF files
-without disturbing the field lengths the format records. Neither package
-requires the other.
+without disturbing the field lengths the format records. qso.el requires it,
+and MELPA installs it along with qso.
