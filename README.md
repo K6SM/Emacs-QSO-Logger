@@ -18,9 +18,15 @@ program.
 - No mouse required: `TAB` and `S-<tab>` move between fields and buttons
 - Entries are appended to a user-specified ADIF file
 - Any ADIF field can appear on the form, in any order
-- Menu choices for BAND, MODE, SUBMODE, CONTEST_ID, PROP_MODE and ANT_PATH, and
-  the format of the log, come from
-  [adif-mode](https://github.com/K6SM/adif-mode)
+- Field names, the values each field accepts, and the format of the log come
+  from [adif-mode](https://github.com/K6SM/adif-mode)
+- A field with a short list of values is a menu; one with a longer list (MODE,
+  SUBMODE, CONTEST_ID, DXCC, ARRL_SECT) is typed, and `M-TAB` completes it
+- Before a contact is logged, each value is checked against the ADIF
+  specification: dates, times, numbers and their ranges, locators, IOTA, POTA,
+  SOTA and WWFF references, codes, and SUBMODE against MODE. Anything
+  questionable is listed, with the choice to log it anyway
+- Codes and fields ADIF allows only in old logs are not offered
 - Each field can keep its value after a submission — useful when frequency and
   mode are unchanged between contacts, and for repeating sent reports in
   contests
@@ -33,7 +39,7 @@ program.
 
 ## Manual Installation
 
-1. Place qso.el and adif.el (from
+1. Place qso.el and adif.el 1.0.7 or later (from
    [adif-mode](https://github.com/K6SM/adif-mode)) in the load path. If one
    hasn't been established, you can place them in `~/.emacs.d/lisp/` and then,
    in the init.el file (located in `~/.emacs.d/`) add:
@@ -48,8 +54,11 @@ program.
 3. Enter the path to the ADIF file you will be using (e.g. `~/qsolog.adi`).
 4. Add, remove, or reorder the fields you wish to have on the form.
 5. Select the fields to be cleared after a submission (helpful for contests).
-6. Click "Apply" or "Apply and Save" as appropriate.
-7. Execute `M-x qso-log-form`.
+6. Optionally, set the width of any field in QSO Field Widths, and the most
+   values a field may have and still be a menu in QSO Menu Choice Limit
+   (35 by default).
+7. Click "Apply" or "Apply and Save" as appropriate.
+8. Execute `M-x qso-log-form`.
 
 The form looks like this:
 
